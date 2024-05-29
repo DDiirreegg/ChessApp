@@ -1,23 +1,16 @@
-// app/(tabs)/MainMenu.tsx
 import React from 'react';
-import { View, Text, StyleSheet, Button, Image } from 'react-native';
-import ChessBoard from './ChessBoard';
-
-interface MainMenuProps {
-  onContinue: () => void;
-  onNewGame: () => void;
-  onExit: () => void;
-  hasSavedGame: boolean;
-}
+import { View, Button, Text, StyleSheet, Image } from 'react-native';
+import { MainMenuProps } from '../(tabs)/types'
 
 const MainMenu: React.FC<MainMenuProps> = ({ onContinue, onNewGame, onExit, hasSavedGame }) => {
+  console.log('Rendering MainMenu component');
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/images/logoMenu.png')} style={styles.logo} />
-      <Text style={styles.title}>Шахматы</Text>
-      {hasSavedGame && <Button title="Countinius" onPress={onContinue} />}
-      <Button title="New game" onPress={onNewGame} />
-      <Button title="Exit" onPress={onExit} />
+      <Text style={styles.title}>Shess</Text>
+      {hasSavedGame && <Button title="Continue" onPress={onContinue} />}
+      <Button title="New Game" onPress={onNewGame}/>
+      <Button title="Exit" onPress={onExit}/>
     </View>
   );
 };
@@ -25,18 +18,19 @@ const MainMenu: React.FC<MainMenuProps> = ({ onContinue, onNewGame, onExit, hasS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
   },
   title: {
     fontSize: 32,
-    marginBottom: 20,
+    marginBottom: 10,
   },
+  logo: {
+    borderRadius: 80,
+    width: 300,
+    height: 300,
+    marginBottom: 20,
+  }
 });
 
 export default MainMenu;

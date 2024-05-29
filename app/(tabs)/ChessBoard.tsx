@@ -1,81 +1,21 @@
-// app/(tabs)/ChessBoard.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image, Text, Modal, Button } from 'react-native';
-import { Chess, Square, Move } from 'chess.js';
-
-const pieceImages = {
-  b: {
-    p: require('../../assets/images/black-pawn.png'),
-    r: require('../../assets/images/black-rook.png'),
-    n: require('../../assets/images/black-knight.png'),
-    b: require('../../assets/images/black-bishop.png'),
-    q: require('../../assets/images/black-queen.png'),
-    k: require('../../assets/images/black-king.png'),
-  },
-  w: {
-    p: require('../../assets/images/white-pawn.png'),
-    r: require('../../assets/images/white-rook.png'),
-    n: require('../../assets/images/white-knight.png'),
-    b: require('../../assets/images/white-bishop.png'),
-    q: require('../../assets/images/white-queen.png'),
-    k: require('../../assets/images/white-king.png'),
-  }
-};
+import { Square } from 'chess.js';
+import { useChessLogic } from './useChessLogic';
+import pieceImages from './pieceImages';
 
 const ChessBoard: React.FC = () => {
-  const [game, setGame] = useState(new Chess());
-  const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [possibleMoves, setPossibleMoves] = useState<Move[]>([]);
-  const [promotionSquare, setPromotionSquare] = useState<Square | null>(null);
-  const [promotionModalVisible, setPromotionModalVisible] = useState(false);
-  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
-  const [playerColor, setPlayerColor] = useState<'w' | 'b' | null>(null);
-  const [colorSelectionVisible, setColorSelectionVisible] = useState(true);
-
-  const handleSquarePress = (square: Square) => {
-    const piece = game.get(square);
-
-    if (promotionModalVisible || colorSelectionVisible) return;
-
-    if (selectedSquare) {
-      const validMove = game.moves({ square: selectedSquare, verbose: true }).some((move: Move) => move.to === square);
-      if (validMove) {
-        const move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
-        if (move) {
-          if (move.flags.includes('p')) {
-            game.undo(); // Отменить ход, чтобы выполнить его позже с правильным превращением
-            setPendingPromotion({ from: selectedSquare, to: square });
-            setPromotionSquare(square);
-            setPromotionModalVisible(true);
-          } else {
-            setGame(new Chess(game.fen()));
-          }
-        }
-      }
-      setSelectedSquare(null);
-      setPossibleMoves([]);
-    } else if (piece && piece.color === game.turn()) {
-      setSelectedSquare(square);
-      const moves = game.moves({ square, verbose: true });
-      setPossibleMoves(moves);
-    }
-  };
-
-  const handlePromotion = (promotion: string) => {
-    if (pendingPromotion) {
-      game.move({ from: pendingPromotion.from, to: pendingPromotion.to, promotion });
-      setGame(new Chess(game.fen()));
-      setPendingPromotion(null);
-      setPromotionSquare(null);
-      setPromotionModalVisible(false);
-    }
-  };
-
-  const handleColorSelection = (color: 'w' | 'b') => {
-    setPlayerColor(color);
-    setColorSelectionVisible(false);
-    setGame(new Chess()); // Сбросить игру при выборе цвета
-  };
+  const {
+    game,
+    selectedSquare,
+    possibleMoves,
+    promotionModalVisible,
+    colorSelectionVisible,
+    playerColor,
+    handleSquarePress,
+    handlePromotion,
+    handleColorSelection,
+  } = useChessLogic();
 
   const renderSquare = (row: number, col: number) => {
     const square = `${String.fromCharCode(97 + col)}${8 - row}` as Square;
@@ -137,7 +77,7 @@ const ChessBoard: React.FC = () => {
             transparent={true}
             animationType="slide"
             visible={promotionModalVisible}
-            onRequestClose={() => setPromotionModalVisible(false)}
+            onRequestClose={() => handlePromotion('q')}
           >
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
@@ -161,7 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     alignItems: 'center',
-    padding: 10, // Дополнительный отступ, чтобы отделить доску от краев экрана
+    padding: 10,
   },
   board: {
     flexDirection: 'column',
