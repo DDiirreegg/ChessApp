@@ -1,4 +1,3 @@
-// app/(tabs)/MainMenu.tsx
 import React from 'react';
 import { View, Button, Text, StyleSheet, Image } from 'react-native';
 import { MainMenuProps } from '../(tabs)/types'
@@ -9,7 +8,6 @@ const MainMenu: React.FC<MainMenuProps> = ({ onContinue, onNewGame, onExit, hasS
     <View style={styles.container}>
       <Image source={require('../../assets/images/logoMenu.png')} style={styles.logo} />
       <Text style={styles.title}>Shess</Text>
-      {hasSavedGame && <Button title="Continue" onPress={onContinue} />}
       <Button title="New Game" onPress={onNewGame}/>
       <Button title="Exit" onPress={onExit}/>
     </View>
@@ -19,8 +17,8 @@ const MainMenu: React.FC<MainMenuProps> = ({ onContinue, onNewGame, onExit, hasS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,

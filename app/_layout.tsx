@@ -5,7 +5,6 @@ import { useColorScheme } from '../hooks/useColorScheme';
 import { Colors } from '../constants/Colors';
 import MainMenu from './(tabs)/MainMenu';
 import { MainMenuProps } from './(tabs)/types';
-import NewGameScreen from './(tabs)/ChessBoard'; 
 import ChessBoard from './(tabs)/ChessBoard';
 
 type Screen = 'mainMenu' | 'Chessboard';
@@ -27,6 +26,10 @@ const Layout: React.FC = () => {
     console.log("Exit game");
   };
 
+  const handleBackToMenu = () => {
+    setCurrentScreen('mainMenu');
+  };
+
   const checkSavedGame = (): boolean => {
     // Логика проверки наличия сохраненной игры
     return true; // Замените реальной логикой
@@ -42,7 +45,7 @@ const Layout: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {currentScreen === 'mainMenu' && <MainMenu {...mainMenuProps} />}
-      {currentScreen === 'Chessboard' && <ChessBoard />}
+      {currentScreen === 'Chessboard' && <ChessBoard onBack={handleBackToMenu} />} 
     </View>
   );
 };
