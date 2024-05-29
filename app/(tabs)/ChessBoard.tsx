@@ -1,3 +1,4 @@
+// app/(tabs)/ChessBoard.tsx
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image, Text, Modal, Button } from 'react-native';
 import { Square } from 'chess.js';

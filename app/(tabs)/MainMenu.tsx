@@ -1,3 +1,4 @@
+// app/(tabs)/MainMenu.tsx
 import React from 'react';
 import { View, Button, Text, StyleSheet, Image } from 'react-native';
 import { MainMenuProps } from '../(tabs)/types'
