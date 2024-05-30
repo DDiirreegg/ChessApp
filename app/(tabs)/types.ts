@@ -4,10 +4,7 @@ export type RootStackParamList = {
 };
 
 
-export interface MainMenuProps {
-  onContinue: () => void;
+export interface MainMenuProps {  
   onNewGame: () => void;
-  onExit: () => void;
-  hasSavedGame: boolean;
 }
 

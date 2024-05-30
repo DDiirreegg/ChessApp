@@ -1,4 +1,3 @@
-// app/(tabs)/ChessBoardStyles.ts
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -104,12 +103,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   movesContainer: {
-    flex: 0.5, // Измените это значение в зависимости от вашего макета
+    flex: 0.5, 
     paddingHorizontal: 10,
   },
   movesContainer1: {
     marginTop: 80,
-    flex: 0.5, // Измените это значение в зависимости от вашего макета
+    flex: 0.5, 
     paddingHorizontal: 10,
   },
   movesList: {

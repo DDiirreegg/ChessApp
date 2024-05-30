@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useColorScheme } from '../hooks/useColorScheme';
@@ -20,26 +19,14 @@ const Layout: React.FC = () => {
 
   const handleNewGame = () => {
     setCurrentScreen('Chessboard');
-  };
-
-  const handleExit = () => {
-    console.log("Exit game");
-  };
+  };  
 
   const handleBackToMenu = () => {
     setCurrentScreen('mainMenu');
-  };
+  };  
 
-  const checkSavedGame = (): boolean => {
-    // Логика проверки наличия сохраненной игры
-    return true; // Замените реальной логикой
-  };
-
-  const mainMenuProps: MainMenuProps = {
-    onContinue: handleContinue,
-    onNewGame: handleNewGame,
-    onExit: handleExit,
-    hasSavedGame: checkSavedGame(),
+  const mainMenuProps: MainMenuProps = {    
+    onNewGame: handleNewGame
   };
 
   return (
