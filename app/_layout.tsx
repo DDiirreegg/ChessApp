@@ -13,10 +13,6 @@ const Layout: React.FC = () => {
   const backgroundColor = Colors[colorScheme].background;
   const [currentScreen, setCurrentScreen] = useState<Screen>('mainMenu');
 
-  const handleContinue = () => {
-    console.log("Continue game");
-  };
-
   const handleNewGame = () => {
     setCurrentScreen('Chessboard');
   };  

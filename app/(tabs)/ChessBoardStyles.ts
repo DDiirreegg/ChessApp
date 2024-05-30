@@ -127,6 +127,9 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: 5,
   },
+  disabledSquare: {
+    opacity: 0.5, 
+  },  
 });
 
 export default styles;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Image, Text, Modal, Button, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Image, Text, Modal, Button, FlatList, StyleSheet } from 'react-native';
 import { Square } from 'chess.js';
 import { useChessLogic } from './useChessLogic';
 import pieceImages from './pieceImages';
@@ -30,10 +30,16 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
     handleSquarePress,
     handlePromotion,
     handleColorSelection,
+    setSelectedSquare,
+    setPossibleMoves,
+    checkmate,
+    stalemate,
+    winner,
+    startNewGame,
+    checkGameOver, // Импортируем функцию checkGameOver
   } = useChessLogic();
 
-  const [whiteMoves, setWhiteMoves] = useState<Move[]>([]);
-  const [blackMoves, setBlackMoves] = useState<Move[]>([]);
+  const [moves, setMoves] = useState<Move[]>([]);
 
   const handleMove = (from: Square, to: Square) => {
     if (!from || from === to) {
@@ -41,20 +47,28 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
       return;
     }
 
-    const piece = game.get(from);
-    const move: Move = { 
-      from, 
-      to, 
-      pieceType: piece?.type as PieceType, 
-      pieceColor: piece?.color as 'w' | 'b' 
-    };
-    handleSquarePress(to);
+    const move = game.move({ from, to, promotion: 'q' });
 
-    if (game.turn() === 'b') {
-      setWhiteMoves([...whiteMoves, move]);
+    if (move) {
+      const pieceMove: Move = { 
+        from, 
+        to, 
+        pieceType: move.piece as PieceType, 
+        pieceColor: move.color as 'w' | 'b' 
+      };
+      setMoves([pieceMove, ...moves]); // Добавление нового хода в начало массива
+      setSelectedSquare(null); // Сброс выбранного квадрата после успешного хода
+      setPossibleMoves([]); // Очистка возможных ходов
+      checkGameOver();
     } else {
-      setBlackMoves([...blackMoves, move]);
+      setSelectedSquare(null); // Сброс выбранного квадрата при неудачном ходе
+      setPossibleMoves([]); // Очистка возможных ходов
     }
+  };
+
+  const handleNewGame = () => {
+    setMoves([]); // Очистка записей о ходах
+    startNewGame();
   };
 
   const renderSquare = (row: number, col: number) => {
@@ -66,13 +80,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
     const isSelectable = piece && piece.color === game.turn();
     const isSelected = selectedSquare === square;
     const isPossibleMove = possibleMoves.some(move => move.to === square);
+    const isDisabled = selectedSquare && !isPossibleMove && selectedSquare !== square;
 
     return (
       <TouchableOpacity
         key={square}
-        style={[styles.square, { backgroundColor }]}
+        style={[styles.square, { backgroundColor }, isDisabled ? styles.disabledSquare : null]}
         onPress={() => handleMove(selectedSquare!, square)}
-        disabled={!isSelectable && !selectedSquare}
+        disabled={!!isDisabled}
       >
         {isPossibleMove && <View style={styles.moveIndicator} />}
         {imageSource && (
@@ -96,8 +111,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
     const pieceImage = pieceImages[item.pieceColor][item.pieceType];
     return (
       <View style={styles.moveContainer}>
+        <Text style={styles.moveText}>{`${moves.length - index}. `}</Text>
         <Image source={pieceImage} style={styles.movePieceImage} />
-        <Text style={styles.moveText}>{`${index + 1}. ${item.from}-${item.to}`}</Text>
+        <Text style={styles.moveText}>{`${item.from}-${item.to}`}</Text>
       </View>
     );
   };
@@ -124,51 +140,22 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
         </View>
       ) : (
         <>
-          {playerColor === 'w' ? (
-            <>
-              <View style={styles.movesContainer1}>
-                {renderMoves(blackMoves)}
-              </View>
-              <View style={styles.boardContainer}>
-                <View style={styles.columnLabels}>
-                  <View style={styles.corner} />
-                  {Array.from({ length: 8 }, (_, col) => (
-                    <Text key={col} style={styles.columnLabel}>
-                      {String.fromCharCode(97 + col)}
-                    </Text>
-                  ))}
-                </View>
-                <View style={styles.board}>
-                  {Array.from({ length: 8 }, (_, row) => renderRow(row))}
-                </View>
-              </View>
-              <View style={styles.movesContainer}>
-                {renderMoves(whiteMoves)}
-              </View>
-            </>
-          ) : (
-            <>
-              <View style={styles.movesContainer1}>
-                {renderMoves(whiteMoves)}
-              </View>
-              <View style={styles.boardContainer}>
-                <View style={styles.columnLabels}>
-                  <View style={styles.corner} />
-                  {Array.from({ length: 8 }, (_, col) => (
-                    <Text key={col} style={styles.columnLabel}>
-                      {String.fromCharCode(97 + col)}
-                    </Text>
-                  ))}
-                </View>
-                <View style={styles.board}>
-                  {Array.from({ length: 8 }, (_, row) => renderRow(row))}
-                </View>
-              </View>
-              <View style={styles.movesContainer}>
-                {renderMoves(blackMoves)}
-              </View>
-            </>
-          )}
+          <View style={styles.boardContainer}>
+            <View style={styles.columnLabels}>
+              <View style={styles.corner} />
+              {Array.from({ length: 8 }, (_, col) => (
+                <Text key={col} style={styles.columnLabel}>
+                  {String.fromCharCode(97 + col)}
+                </Text>
+              ))}
+            </View>
+            <View style={styles.board}>
+              {Array.from({ length: 8 }, (_, row) => renderRow(row))}
+            </View>
+          </View>
+          <View style={styles.movesContainer}>
+            {renderMoves(moves)}
+          </View>
           <Modal
             transparent={true}
             animationType="slide"
@@ -183,6 +170,24 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
                   <Button title="Rook" onPress={() => handlePromotion('r')} />
                   <Button title="Knight" onPress={() => handlePromotion('n')} />
                   <Button title="Bishops" onPress={() => handlePromotion('b')} />
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            transparent={true}
+            animationType="slide"
+            visible={checkmate || stalemate}
+            onRequestClose={() => { }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  {checkmate ? `${winner === 'w' ? 'White' : 'Black'} win!` : 'Stalemate! The game is a draw.'}
+                </Text>
+                <View style={styles.modalButtons}>
+                  <Button title="New Game" onPress={handleNewGame} />
+                  <Button title="Menu" onPress={onBack} />
                 </View>
               </View>
             </View>
