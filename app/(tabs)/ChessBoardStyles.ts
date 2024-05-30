@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative', // Добавляем это свойство
+    position: 'relative',
     padding: 10,
   },
   backButton: {
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 5, // Дистанция между буквами и доской
+    marginBottom: 5,
   },
   columnLabel: {
     width: 40,
@@ -99,9 +99,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   colorSelectionTitle: {
-    marginTop: 350,
+    marginTop: 400,
     fontSize: 24,
     marginBottom: 20,
+  },
+  movesContainer: {
+    flex: 0.5, // Измените это значение в зависимости от вашего макета
+    paddingHorizontal: 10,
+  },
+  movesContainer1: {
+    marginTop: 80,
+    flex: 0.5, // Измените это значение в зависимости от вашего макета
+    paddingHorizontal: 10,
+  },
+  movesList: {
+    flex: 1,
+  },
+  moveText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

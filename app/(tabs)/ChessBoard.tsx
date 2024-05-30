@@ -1,6 +1,5 @@
-// app/(tabs)/ChessBoard.tsx
-import React from 'react';
-import { View, TouchableOpacity, Image, Text, Modal, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Image, Text, Modal, Button, FlatList } from 'react-native';
 import { Square } from 'chess.js';
 import { useChessLogic } from './useChessLogic';
 import pieceImages from './pieceImages';
@@ -24,6 +23,29 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
     handleColorSelection,
   } = useChessLogic();
 
+  const [whiteMoves, setWhiteMoves] = useState<string[]>([]);
+  const [blackMoves, setBlackMoves] = useState<string[]>([]);
+
+  const handleMove = (from: Square, to: Square) => {
+    if (!from || from === to) {
+      // Не сохраняем ход, если только выбрана фигура (первый клик) или ход не изменился
+      handleSquarePress(to);
+      return;
+    }
+  
+    // Сохраняем ход перед сменой хода в игре
+    const move = `${from}-${to}`;
+    handleSquarePress(to);
+    if (game.turn() === 'b') {
+      // Ход белых завершился, сохраняем его
+      setWhiteMoves([...whiteMoves, move]);
+    } else {
+      // Ход черных завершился, сохраняем его
+      setBlackMoves([...blackMoves, move]);
+    }
+  };
+  
+
   const renderSquare = (row: number, col: number) => {
     const square = `${String.fromCharCode(97 + col)}${8 - row}` as Square;
     const piece = game.get(square);
@@ -38,7 +60,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
       <TouchableOpacity
         key={square}
         style={[styles.square, { backgroundColor }]}
-        onPress={() => handleSquarePress(square)}
+        onPress={() => handleMove(selectedSquare || square, square)}
         disabled={!isSelectable && !selectedSquare}
       >
         {isPossibleMove && <View style={styles.moveIndicator} />}
@@ -59,6 +81,12 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
     );
   };
 
+  const renderMove = ({ item, index }: { item: string, index: number }) => (
+    <Text style={styles.moveText}>{`${index + 1}. ${item}`}</Text>
+  );
+
+  
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={onBack}>
@@ -72,6 +100,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
         </View>
       ) : (
         <>
+          <View style={styles.movesContainer1}>
+            <FlatList
+              data={blackMoves}
+              renderItem={renderMove}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.movesList}
+            />
+          </View>
           <View style={styles.boardContainer}>
             <View style={styles.columnLabels}>
               <View style={styles.corner} />
@@ -84,6 +120,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ onBack }) => {
             <View style={styles.board}>
               {Array.from({ length: 8 }, (_, row) => renderRow(row))}
             </View>
+          </View>
+          <View style={styles.movesContainer}>
+            <FlatList
+              data={whiteMoves}
+              renderItem={renderMove}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.movesList}
+            />
           </View>
           <Modal
             transparent={true}
