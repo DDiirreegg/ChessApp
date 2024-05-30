@@ -10,3 +10,4 @@ export interface MainMenuProps {
   onExit: () => void;
   hasSavedGame: boolean;
 }
+

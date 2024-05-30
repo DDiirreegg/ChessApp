@@ -119,6 +119,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  moveContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  movePieceImage: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
+  },
 });
 
 export default styles;
